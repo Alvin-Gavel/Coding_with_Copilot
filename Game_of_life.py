@@ -1,7 +1,8 @@
 """
 This is an experiment in using GitHub Copilot, by testing how quickly I can
-make a module that plays Conway's Game of Life, using spaces to denote dead
-squares and asterisks to denote live ones.
+make a module that plays Conway's Game of Life on a toroidal grid. It prints
+the board out using spaces to denote dead squares and asterisks to denote live
+ones.
 """
 
 import numpy as np
@@ -9,17 +10,18 @@ import numpy as np
 def iterate(board):
     rows, cols = board.shape
     new_board = np.zeros(board.shape, dtype=int)
-    for i in range(rows):
-        for j in range(cols):
-            neighbors = board[max(0, i-1):min(rows, i+2),
-                              max(0, j-1):min(cols, j+2)]
-            neighbors_sum = np.sum(neighbors) - board[i, j]
-            if board[i, j] == 1:
-                if neighbors_sum in (2, 3):
-                    new_board[i, j] = 1
-            else:
-                if neighbors_sum == 3:
-                    new_board[i, j] = 1
+    neighbours_sum = np.zeros(board.shape, dtype=int)
+    neighbours_sum += np.roll(board, 1, axis=0)
+    neighbours_sum += np.roll(board, -1, axis=0)
+    neighbours_sum += np.roll(board, 1, axis=1)
+    neighbours_sum += np.roll(board, -1, axis=1)
+    neighbours_sum += np.roll(np.roll(board, 1, axis=0), 1, axis=1)
+    neighbours_sum += np.roll(np.roll(board, 1, axis=0), -1, axis=1)
+    neighbours_sum += np.roll(np.roll(board, -1, axis=0), 1, axis=1)
+    neighbours_sum += np.roll(np.roll(board, -1, axis=0), -1, axis=1)
+    new_board[(board == 1) & (neighbours_sum == 2)] = 1
+    new_board[(board == 1) & (neighbours_sum == 3)] = 1
+    new_board[(board == 0) & (neighbours_sum == 3)] = 1
     return new_board
 
 def print_board(board):
