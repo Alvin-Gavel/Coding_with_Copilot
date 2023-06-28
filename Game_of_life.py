@@ -6,6 +6,7 @@ ones.
 """
 
 import numpy as np
+import time
 
 def iterate(board):
     rows, cols = board.shape
@@ -36,6 +37,7 @@ def print_board(board):
 
 def play_game(board, steps):
     for i in range(steps):
+        time.sleep(0.4)
         print_board(board)
         board = iterate(board)
     return
